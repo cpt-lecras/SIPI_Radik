@@ -22,7 +22,7 @@ async def start_handler(msg: Message):
 
 @router.message(F.text=="📄 Инфо")
 async def start_handler(msg: Message):
-    await msg.answer("инфо")
+    await msg.answer(text.T_info, parse_mode=ParseMode.MARKDOWN_V2)
 
 
 @router.message(F.text=="⚙️ Профиль")
@@ -57,7 +57,7 @@ async def set_group_start(msg: Message, state: FSMContext):
 
 @router.message(F.text=="📊 Другая группа")
 async def start_handler(msg: Message):
-    await msg.answer("инфо")
+    await msg.answer("What")
 
 
 @router.message(F.text=="📅 Мое Расписание")
