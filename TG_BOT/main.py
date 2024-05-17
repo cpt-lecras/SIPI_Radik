@@ -5,8 +5,8 @@ import os
 from aiogram import Bot, Dispatcher
 from aiogram.enums.parse_mode import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
-import db
-from handlers import router
+from TG_BOT import db
+from TG_BOT.handlers import router
 from dotenv import load_dotenv
 
 

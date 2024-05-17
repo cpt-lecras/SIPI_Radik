@@ -1,10 +1,3 @@
-from aiogram import types, F, Router
-from aiogram.types import Message
-from aiogram.enums import ParseMode
-
-import kb
-import text
-
 #Функция с проверкой
 """
 def profile(msg):

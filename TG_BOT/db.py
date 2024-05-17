@@ -1,4 +1,5 @@
 import psycopg2 as ps
+from psycopg2 import errors
 
 dbname = 'postgres'
 user = 'postgres'
@@ -93,21 +94,42 @@ async def db_start():
     db.commit()
 
 
-async def registrate(id,name):
-    cur.execute("SELECT * FROM accounts WHERE tg_id=%s", (id,))
-    user = cur.fetchone()
-    if not user:
-        cur.execute("INSERT INTO accounts (tg_id, name) VALUES (%s, %s)", (id, name))
-        db.commit()
+async def registrate(id, name):
+    try:
+        cur.execute("SELECT * FROM accounts WHERE tg_id=%s", (id,))
+        user = cur.fetchone()
+        if not user:
+            dtext="Не установлена"
+            cur.execute("INSERT INTO all_groups (name) VALUES (%s) RETURNING id_group", (dtext,))
+            id_group = cur.fetchone()[0]
+            cur.execute("INSERT INTO accounts (tg_id, name,id_group) VALUES (%s, %s, %s)", (id, name, id_group))
 
-async def set_group(id,group):
-    #добавить проверку на корректность группы
-    cur.execute("UPDATE accounts SET groupname=%s WHERE tg_id=%s", (group, id))
-    db.commit()
+            db.commit()
+    except (Exception, errors.Error) as e:
+        print("Ошибка при регистрации:", e)
+        db.rollback()
+
+async def set_group(id, group):
+    try:
+        # добавить проверку на корректность группы
+        cur.execute("SELECT id_group FROM accounts WHERE tg_id=%s", (id,))
+        gr_id=cur.fetchone()[0]
+        cur.execute("UPDATE all_groups SET name=%s WHERE id_group=%s", (group,gr_id))
+        db.commit()
+    except (Exception, errors.Error) as e:
+        print("Ошибка при установке группы:", e)
+        db.rollback()
 
 async def get_group(id):
-    cur.execute("SELECT groupname FROM accounts WHERE tg_id=%s", (id,))
-    gr=cur.fetchone()[2]
-    return gr
+    try:
+        cur.execute("SELECT a.tg_id,ag.name FROM all_groups ag JOIN accounts a ON a.id_group=ag.id_group WHERE tg_id=%s", (id,))
+        gr = cur.fetchone()[1]
+        return gr
+    except (Exception, errors.Error) as e:
+        print("Ошибка при получении группы:", e)
+        db.rollback()
+
+
+
 
 

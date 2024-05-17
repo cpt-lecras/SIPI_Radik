@@ -1,14 +1,12 @@
-from aiogram import types, F, Router
+from aiogram import F, Router
 from aiogram.types import Message, CallbackQuery
 from aiogram.enums import ParseMode
-from aiogram.filters import Command, StateFilter
+from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import StatesGroup, State
-
 
 import kb
 import text
-import db
+from TG_BOT import db
 import states as st
 
 router = Router()
@@ -44,7 +42,7 @@ async def start_handler(msg: Message):
     """
     id=msg.from_user.id
     if (await db.get_group(id)==None):
-        await msg.answer(text.T_profile.format(name=msg.from_user.full_name, group="Не установлена"), parse_mode=ParseMode.MARKDOWN_V2,reply_markup=kb.inl_setgroup)
+        await msg.answer(text.T_profile.format(name=msg.from_user.full_name, group="Не установлена"), parse_mode=ParseMode.MARKDOWN_V2, reply_markup=kb.inl_setgroup)
     else:
         await msg.answer(text.T_profile.format(name=msg.from_user.full_name, group=await db.get_group(id)),
                          parse_mode=ParseMode.MARKDOWN_V2, reply_markup=kb.inl_setgroup)
@@ -71,7 +69,7 @@ async def set_group_start(msg: Message, state: FSMContext):
     #добавить проверку что группа есть в бд
     id = msg.from_user.id
     user_data = await state.get_data()
-    await db.set_group(id,user_data['group'])
+    await db.set_group(id, user_data['group'])
     await state.clear()
     await msg.answer("Успешно")
 
